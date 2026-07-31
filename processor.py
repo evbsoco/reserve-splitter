@@ -35,7 +35,7 @@ def process_file(filepath):
 
     df = pd.read_excel(filepath)
 
-    z_values = sorted(df["z new"].dropna().unique())
+    z_values = sorted(df["z"].dropna().unique())
 
     # ---------------- Write outputs ----------------
 
@@ -43,7 +43,7 @@ def process_file(filepath):
 
         for z in z_values:
 
-            df_z = df[df["z new"] == z]
+            df_z = df[df["z"] == z]
 
             sheet_name = str(int(z))
 
