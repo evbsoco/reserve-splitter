@@ -1,11 +1,26 @@
+import sys
+from pathlib import Path
+
 import customtkinter as ctk
 from tkinter import filedialog
-from pathlib import Path
 from PIL import Image
 
 from processor import process_file
 
 ctk.set_appearance_mode("dark")
+
+
+def resource_path(relative_path):
+    """
+    Returns the correct path to a resource whether running from
+    source or from a PyInstaller executable.
+    """
+    if getattr(sys, "frozen", False):
+        base_path = Path(sys._MEIPASS)
+    else:
+        base_path = Path(__file__).resolve().parent
+
+    return base_path / relative_path
 
 
 class App(ctk.CTk):
@@ -21,7 +36,7 @@ class App(ctk.CTk):
         self.GOLD_HOVER = "#D98A2B"
         self.WHITE = "#F5F5F5"
 
-        self.title("Reserve Splitter")
+        self.title("Level Plan Reserve Splitter")
         self.geometry("820x650")
         self.resizable(False, False)
 
@@ -29,16 +44,14 @@ class App(ctk.CTk):
 
         self.selected_files = []
 
-        project = Path(__file__).resolve().parent
-
         # ================= HEADER =================
 
-        logo_path = project / "assets" / "KMI logo.png"
+        logo_path = resource_path("assets/KMI logo.png")
 
         self.logo = ctk.CTkImage(
             light_image=Image.open(logo_path),
             dark_image=Image.open(logo_path),
-            size=(420,124)       # keeps original aspect ratio
+            size=(420, 124)
         )
 
         logo = ctk.CTkLabel(
@@ -47,16 +60,16 @@ class App(ctk.CTk):
             text=""
         )
 
-        logo.pack(pady=(20,10))
+        logo.pack(pady=(20, 10))
 
         title = ctk.CTkLabel(
             self,
-            text="Reserve Splitter",
-            font=("Segoe UI",30,"bold"),
+            text="Level Plan Reserve Splitter",
+            font=("Segoe UI", 30, "bold"),
             text_color=self.WHITE
         )
 
-        title.pack(pady=(0,20))
+        title.pack(pady=(0, 20))
 
         # ================= FILE BOX =================
 
@@ -67,7 +80,7 @@ class App(ctk.CTk):
             fg_color=self.PANEL,
             border_width=2,
             border_color=self.GOLD,
-            font=("Consolas",13),
+            font=("Consolas", 13),
             text_color="white"
         )
 
@@ -85,61 +98,40 @@ class App(ctk.CTk):
         button_frame.pack(pady=25)
 
         browse_button = ctk.CTkButton(
-
             button_frame,
-
             text="Select Files",
-
             width=180,
             height=42,
-
             fg_color=self.GOLD,
             hover_color=self.GOLD_HOVER,
-
             text_color="black",
-
-            font=("Segoe UI",15,"bold"),
-
+            font=("Segoe UI", 15, "bold"),
             command=self.select_files
-
         )
 
-        browse_button.grid(row=0,column=0,padx=10)
+        browse_button.grid(row=0, column=0, padx=10)
 
         process_button = ctk.CTkButton(
-
             button_frame,
-
             text="Process",
-
             width=180,
             height=42,
-
             fg_color=self.GOLD,
             hover_color=self.GOLD_HOVER,
-
             text_color="black",
-
-            font=("Segoe UI",15,"bold"),
-
+            font=("Segoe UI", 15, "bold"),
             command=self.process_files
-
         )
 
-        process_button.grid(row=0,column=1,padx=10)
+        process_button.grid(row=0, column=1, padx=10)
 
         # ================= STATUS =================
 
         self.status = ctk.CTkLabel(
-
             self,
-
             text="Status: Ready",
-
-            font=("Segoe UI",15),
-
+            font=("Segoe UI", 15),
             text_color=self.GOLD
-
         )
 
         self.status.pack(pady=15)
@@ -149,24 +141,19 @@ class App(ctk.CTk):
     def select_files(self):
 
         files = filedialog.askopenfilenames(
-
             title="Select Reserve Files",
-
-            filetypes=[("Excel Files","*.xlsx")]
-
+            filetypes=[("Excel Files", "*.xlsx")]
         )
 
         self.selected_files = files
 
-        self.file_box.delete("1.0","end")
+        self.file_box.delete("1.0", "end")
 
         if not files:
-
-            self.file_box.insert("1.0","No files selected.")
+            self.file_box.insert("1.0", "No files selected.")
             return
 
         for file in files:
-
             self.file_box.insert(
                 "end",
                 Path(file).name + "\n"
