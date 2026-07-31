@@ -1,5 +1,6 @@
 from pathlib import Path
 import pandas as pd
+import sys
 
 
 def process_file(filepath):
@@ -9,11 +10,18 @@ def process_file(filepath):
     # "A1B1 RESERVE.xlsx" -> "A1B1"
     title = filepath.stem.replace(" RESERVE", "")
 
-    # Project root (folder containing main.py, gui.py, processor.py)
-    project_root = Path(__file__).resolve().parent
+    # ---------------- Determine application folder ----------------
 
-    # Outputs folder
-    output_root = project_root / "outputs"
+    if getattr(sys, "frozen", False):
+        # Running as EXE
+        app_dir = Path(sys.executable).parent
+    else:
+        # Running from Python
+        app_dir = Path(__file__).resolve().parent
+
+    # ---------------- Outputs folder ----------------
+
+    output_root = app_dir / "outputs"
     output_root.mkdir(exist_ok=True)
 
     # Output workbook
@@ -23,19 +31,27 @@ def process_file(filepath):
     output_dir = output_root / title
     output_dir.mkdir(exist_ok=True)
 
-    # Read Excel
+    # ---------------- Read Excel ----------------
+
     df = pd.read_excel(filepath)
 
-    # Get unique z values
     z_values = sorted(df["z new"].dropna().unique())
 
-    # Create workbook and CSVs
+    # ---------------- Write outputs ----------------
+
     with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
+
         for z in z_values:
+
             df_z = df[df["z new"] == z]
+
             sheet_name = str(int(z))
 
             df_z.to_excel(writer, sheet_name=sheet_name, index=False)
-            df_z.to_csv(output_dir / f"{sheet_name}.csv", index=False)
+
+            df_z.to_csv(
+                output_dir / f"{sheet_name}.csv",
+                index=False
+            )
 
     return output_file
