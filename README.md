@@ -4,7 +4,7 @@
 
 This project automates the process of splitting reserve data stored in Microsoft Excel into separate files based on unique elevation levels.
 
-Given one or more reserve workbooks, the script identifies each unique value in the **`z`** (elevation) column and generates:
+Given one or more reserve workbooks, the script identifies each unique value in the **`z`** (elevation level) column and generates:
 
 * A new Excel workbook containing one worksheet for each elevation level.
 * A folder containing CSV files, with one CSV corresponding to each elevation level.
